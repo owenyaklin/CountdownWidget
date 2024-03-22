@@ -38,6 +38,12 @@ public class MainActivity extends AppCompatActivity {
         doTheAutoRefresh();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacksAndMessages(null);
+    }
+
     private void doTheAutoRefresh() {
         handler.postDelayed(() -> {
             // Write code for your refresh logic
@@ -56,8 +62,7 @@ public class MainActivity extends AppCompatActivity {
         difference = difference.minusHours(differenceHours);
         long differenceMinutes = difference.toMinutes();
         difference = difference.minusMinutes(differenceMinutes);
-        if (difference.getSeconds() > 0)
-            differenceMinutes += 1;
+        if (difference.getSeconds() > 0) differenceMinutes += 1;
         StringBuilder countdownString = new StringBuilder();
         boolean started = false;
         if (differenceDays > 0) {
