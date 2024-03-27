@@ -2,7 +2,9 @@ package com.example.countdownwidget;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -17,12 +19,10 @@ import java.util.TimeZone;
  */
 public class CountdownWidgetProvider extends AppWidgetProvider {
     private static final String LOG = "CountdownWidgetProvider";
-
+    private static boolean keepRunning = false;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final TimeZone countdownTimeZone = TimeZone.getTimeZone("America/New_York");
     private final ZonedDateTime targetTime = ZonedDateTime.of(2024, 10, 20, 8, 0, 0, 0, countdownTimeZone.toZoneId());
-
-    private static boolean keepRunning = false;
 
     void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
 
@@ -39,6 +39,7 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
+        Log.d(LOG, "onUpdate");
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
         }
@@ -49,7 +50,7 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
         // Enter relevant functionality for when the first widget is created
         Log.d(LOG, "onEnabled");
         keepRunning = true;
-        doTheAutoRefresh();
+        doTheAutoRefresh(context);
     }
 
     @Override
@@ -60,14 +61,27 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
         handler.removeCallbacksAndMessages(null);
     }
 
-    private void doTheAutoRefresh() {
+    private void doTheAutoRefresh(Context context) {
         handler.postDelayed(() -> {
             // Write code for your refresh logic
             Log.d(LOG, "doTheAutoRefresh");
+            sendUpdateIntent(context);
             if (keepRunning) {
-                doTheAutoRefresh();
+                doTheAutoRefresh(context);
             }
         }, 1000);
+    }
+
+    private void sendUpdateIntent(Context context) {
+        Intent intent = new Intent(context.getApplicationContext(), CountdownWidgetProvider.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        // Use an array and EXTRA_APPWIDGET_IDS instead of AppWidgetManager.EXTRA_APPWIDGET_ID,
+        // since it seems the onUpdate() is only fired on that:
+        AppWidgetManager widgetManager = AppWidgetManager.getInstance(context);
+        int[] ids = widgetManager.getAppWidgetIds(new ComponentName(context, CountdownWidgetProvider.class));
+
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        context.sendBroadcast(intent);
     }
 
     private String calculateCountdown() {
