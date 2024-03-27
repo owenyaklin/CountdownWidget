@@ -3,6 +3,7 @@ package com.example.countdownwidget;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -16,7 +17,8 @@ import java.time.ZonedDateTime;
 import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
-
+    private static final String LOG = "MainActivity";
+    private static boolean keepRunning = false;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final TimeZone countdownTimeZone = TimeZone.getTimeZone("America/New_York");
     //private String[] availableTimeZones = TimeZone.getAvailableIDs();
@@ -25,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(LOG, "onCreate");
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -35,20 +38,26 @@ public class MainActivity extends AppCompatActivity {
         //TimeZone timeZone = TimeZone.getDefault();
         //String name = timeZone.getID();
         calculateCountdown();
+        keepRunning = true;
         doTheAutoRefresh();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d(LOG, "onDestroy");
+        keepRunning = false;
         handler.removeCallbacksAndMessages(null);
     }
 
     private void doTheAutoRefresh() {
         handler.postDelayed(() -> {
             // Write code for your refresh logic
+            Log.d(LOG, "doTheAutoRefresh");
             calculateCountdown();
-            doTheAutoRefresh();
+            if (keepRunning) {
+                doTheAutoRefresh();
+            }
         }, 1000);
     }
 

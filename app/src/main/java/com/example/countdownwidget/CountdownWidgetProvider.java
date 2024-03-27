@@ -3,6 +3,9 @@ package com.example.countdownwidget;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import java.time.Duration;
@@ -13,9 +16,13 @@ import java.util.TimeZone;
  * Implementation of App Widget functionality.
  */
 public class CountdownWidgetProvider extends AppWidgetProvider {
+    private static final String LOG = "CountdownWidgetProvider";
 
+    private final Handler handler = new Handler(Looper.getMainLooper());
     private final TimeZone countdownTimeZone = TimeZone.getTimeZone("America/New_York");
     private final ZonedDateTime targetTime = ZonedDateTime.of(2024, 10, 20, 8, 0, 0, 0, countdownTimeZone.toZoneId());
+
+    private static boolean keepRunning = false;
 
     void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
 
@@ -40,11 +47,27 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
     @Override
     public void onEnabled(Context context) {
         // Enter relevant functionality for when the first widget is created
+        Log.d(LOG, "onEnabled");
+        keepRunning = true;
+        doTheAutoRefresh();
     }
 
     @Override
     public void onDisabled(Context context) {
         // Enter relevant functionality for when the last widget is disabled
+        Log.d(LOG, "onDisabled");
+        keepRunning = false;
+        handler.removeCallbacksAndMessages(null);
+    }
+
+    private void doTheAutoRefresh() {
+        handler.postDelayed(() -> {
+            // Write code for your refresh logic
+            Log.d(LOG, "doTheAutoRefresh");
+            if (keepRunning) {
+                doTheAutoRefresh();
+            }
+        }, 1000);
     }
 
     private String calculateCountdown() {
