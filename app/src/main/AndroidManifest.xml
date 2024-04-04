@@ -12,7 +12,8 @@
         android:theme="@style/Theme.CountdownWidget">
         <activity
             android:name=".CreateActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".MenuActivity" />
         <activity
             android:name=".MenuActivity"
             android:exported="true"
