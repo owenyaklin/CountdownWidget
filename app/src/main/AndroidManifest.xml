@@ -11,6 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CountdownWidget">
         <activity
+            android:name=".CreateActivity"
+            android:exported="false" />
+        <activity
             android:name=".MenuActivity"
             android:exported="true"
             android:theme="@style/Theme.CountdownWidget.NoActionBar">
@@ -36,7 +39,6 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
-
     </application>
 
 </manifest>
