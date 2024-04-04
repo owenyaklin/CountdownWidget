@@ -19,7 +19,7 @@ import java.util.TimeZone;
  */
 public class CountdownWidgetProvider extends AppWidgetProvider {
     private static final String LOG = "CountdownWidgetProvider";
-    private static boolean keepRunning = false;
+    private static boolean keepRunning = true;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final TimeZone countdownTimeZone = TimeZone.getTimeZone("America/New_York");
     private final ZonedDateTime targetTime = ZonedDateTime.of(2024, 10, 20, 8, 0, 0, 0, countdownTimeZone.toZoneId());
