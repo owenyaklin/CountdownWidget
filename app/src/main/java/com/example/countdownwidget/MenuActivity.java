@@ -1,6 +1,7 @@
 package com.example.countdownwidget;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
@@ -16,7 +17,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 public class MenuActivity extends AppCompatActivity {
-
+    private static final String LOG = "MenuActivity";
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMenuBinding binding;
 
@@ -28,6 +29,7 @@ public class MenuActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarMenu.toolbar);
+
         binding.appBarMenu.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -40,6 +42,12 @@ public class MenuActivity extends AppCompatActivity {
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow).setOpenableLayout(drawer).build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_menu);
+        navController.addOnDestinationChangedListener((navController1, navDestination, bundle) -> {
+            Log.d(LOG, "navController.onDestinationChanged");
+            if (R.id.nav_home == navDestination.getId()) {
+                binding.appBarMenu.toolbar.setTitle(R.string.app_name);
+            }
+        });
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
     }
