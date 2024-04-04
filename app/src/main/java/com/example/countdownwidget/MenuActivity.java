@@ -1,9 +1,9 @@
 package com.example.countdownwidget;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -14,7 +14,6 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.countdownwidget.databinding.ActivityMenuBinding;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 
 public class MenuActivity extends AppCompatActivity {
     private static final String LOG = "MenuActivity";
@@ -30,11 +29,9 @@ public class MenuActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.appBarMenu.toolbar);
 
-        binding.appBarMenu.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).setAnchorView(R.id.fab).show();
-            }
+        binding.appBarMenu.fab.setOnClickListener(view -> {
+            Intent createIntent = new Intent(MenuActivity.this, CreateActivity.class);
+            MenuActivity.this.startActivity(createIntent);
         });
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
