@@ -20,7 +20,7 @@ public class CreateViewModel extends ViewModel {
     private final MutableLiveData<String> mTimeZone;
 
     public CreateViewModel() {
-        mName = new MutableLiveData<>("Countdown Name");
+        mName = new MutableLiveData<>("");
         mDate = new MutableLiveData<>(Calendar.getInstance());
         SimpleDateFormat dateSdf = new SimpleDateFormat("M/d/yyyy", Locale.US);
         Date mDateDate = Objects.requireNonNull(mDate.getValue()).getTime();

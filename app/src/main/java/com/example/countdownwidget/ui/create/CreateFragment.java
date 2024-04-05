@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.countdownwidget.R;
 import com.example.countdownwidget.databinding.FragmentCreateBinding;
 
 import java.util.TimeZone;
@@ -50,7 +51,7 @@ public class CreateFragment extends Fragment {
         final TextView textTime = binding.fragmentCreateTimeText;
         mViewModel.getTimeText().observe(getViewLifecycleOwner(), textTime::setText);
         final Spinner timeZoneSpinner = binding.fragmentCreateTimeZone;
-        ArrayAdapter<String> tzAdapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_item, TimeZone.getAvailableIDs());
+        ArrayAdapter<String> tzAdapter = new ArrayAdapter<>(requireActivity(), R.layout.time_zone_spinner_item, TimeZone.getAvailableIDs());
         timeZoneSpinner.setAdapter(tzAdapter);
         if (mViewModel.getTimeZone().getValue() != null) {
             int spinnerPosition = tzAdapter.getPosition(mViewModel.getTimeZone().getValue());
