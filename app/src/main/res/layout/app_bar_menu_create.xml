@@ -16,8 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:title="@string/activity_create_title"
-            app:popupTheme="@style/Theme.CountdownWidget.PopupOverlay" />
+            app:popupTheme="@style/Theme.CountdownWidget.PopupOverlay"
+            app:title="@string/activity_create_title" />
     </com.google.android.material.appbar.AppBarLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

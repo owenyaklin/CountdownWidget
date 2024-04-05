@@ -21,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
     private static boolean keepRunning = false;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final TimeZone countdownTimeZone = TimeZone.getTimeZone("America/New_York");
-    //private String[] availableTimeZones = TimeZone.getAvailableIDs();
     private final ZonedDateTime targetTime = ZonedDateTime.of(2024, 10, 20, 8, 0, 0, 0, countdownTimeZone.toZoneId());
 
     @Override
@@ -35,8 +34,6 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        //TimeZone timeZone = TimeZone.getDefault();
-        //String name = timeZone.getID();
         calculateCountdown();
         keepRunning = true;
         doTheAutoRefresh();
