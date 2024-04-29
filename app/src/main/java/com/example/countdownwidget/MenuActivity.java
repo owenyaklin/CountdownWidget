@@ -1,10 +1,13 @@
 package com.example.countdownwidget;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
@@ -19,6 +22,22 @@ public class MenuActivity extends AppCompatActivity {
     private static final String LOG = "MenuActivity";
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMenuBinding binding;
+    private FragmentRefreshListener fragmentRefreshListener;
+    ActivityResultLauncher<Intent> createActivityResultLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            // There are no request codes
+            getFragmentRefreshListener().onRefresh();
+        }
+    });
+
+    public FragmentRefreshListener getFragmentRefreshListener() {
+        return fragmentRefreshListener;
+    }
+
+    public void setFragmentRefreshListener(FragmentRefreshListener fragmentRefreshListener) {
+        this.fragmentRefreshListener = fragmentRefreshListener;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,13 +50,14 @@ public class MenuActivity extends AppCompatActivity {
 
         binding.appBarMenu.fab.setOnClickListener(view -> {
             Intent createIntent = new Intent(MenuActivity.this, CreateActivity.class);
-            MenuActivity.this.startActivity(createIntent);
+            createActivityResultLauncher.launch(createIntent);
         });
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_home, R.id.nav_help).setOpenableLayout(drawer).build();
+        mAppBarConfiguration =
+                new AppBarConfiguration.Builder(R.id.nav_home, R.id.nav_help).setOpenableLayout(drawer).build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_menu);
         navController.addOnDestinationChangedListener((navController1, navDestination, bundle) -> {
             Log.d(LOG, "navController.onDestinationChanged");
@@ -60,5 +80,9 @@ public class MenuActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_menu);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
+    }
+
+    public interface FragmentRefreshListener {
+        void onRefresh();
     }
 }

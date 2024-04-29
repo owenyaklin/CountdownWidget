@@ -1,5 +1,6 @@
 package com.example.countdownwidget.ui.create;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -93,7 +94,11 @@ public class CreateFragment extends Fragment {
                 mViewModel.getTimeZone().setValue("");
             }
         });
-        binding.fragmentCreateCreate.setOnClickListener(v -> mDatabase.writeNewCountdown(mViewModel));
+        binding.fragmentCreateCreate.setOnClickListener(v -> {
+            mDatabase.writeNewCountdown(mViewModel);
+            requireActivity().setResult(Activity.RESULT_OK);
+            requireActivity().finish();
+        });
 
         mDatabase = new CountdownDatabase(getActivity());
 

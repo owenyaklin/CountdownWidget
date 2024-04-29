@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.countdownwidget.MenuActivity;
 import com.example.countdownwidget.business.CountdownListAdapter;
 import com.example.countdownwidget.data.CountdownDatabase;
 import com.example.countdownwidget.data.CountdownItem;
@@ -33,6 +34,8 @@ public class HomeFragment extends Fragment {
 
         mDatabase = new CountdownDatabase(getActivity());
         queryCountdowns();
+
+        ((MenuActivity) requireActivity()).setFragmentRefreshListener(this::queryCountdowns);
 
         return root;
     }
