@@ -36,6 +36,18 @@ public class CountdownItem implements Comparable<CountdownItem> {
         return mName;
     }
 
+    public String getDateText() {
+        return mDateText;
+    }
+
+    public String getTimeText() {
+        return mTimeText;
+    }
+
+    public String getTimeZone() {
+        return mTimeZone;
+    }
+
     @Override
     public int compareTo(CountdownItem o) {
         return Long.compare(mId, o.getId());

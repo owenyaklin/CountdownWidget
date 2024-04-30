@@ -33,7 +33,14 @@ public class CountdownListAdapter extends RecyclerView.Adapter<CountdownListItem
     public void onBindViewHolder(@NonNull CountdownListItem holder, int position) {
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
-        holder.getTitleTextView().setText(values.get(position).getName());
+
+        CountdownItem positionItem = values.get(position);
+        holder.getTitleTextView().setText(positionItem.getName());
+        holder.getTimeZoneTextView().setText(positionItem.getTimeZone());
+        String dateText = positionItem.getDateText();
+        String timeText = positionItem.getTimeText();
+        String dateTimeText = dateText + " " + timeText;
+        holder.getDateTimeTextView().setText(dateTimeText);
     }
 
     @Override
