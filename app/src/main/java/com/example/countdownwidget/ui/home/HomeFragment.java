@@ -1,5 +1,6 @@
 package com.example.countdownwidget.ui.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,11 +11,13 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.countdownwidget.CreateActivity;
 import com.example.countdownwidget.MenuActivity;
 import com.example.countdownwidget.business.CountdownListAdapter;
 import com.example.countdownwidget.data.CountdownDatabase;
 import com.example.countdownwidget.data.CountdownItem;
 import com.example.countdownwidget.databinding.FragmentHomeBinding;
+import com.example.countdownwidget.ui.create.CreateFragment;
 
 import java.util.ArrayList;
 
@@ -48,7 +51,13 @@ public class HomeFragment extends Fragment {
 
     private void queryCountdowns() {
         ArrayList<CountdownItem> countdownRows = mDatabase.getAllCountdowns();
-        binding.listCountdowns.setAdapter(new CountdownListAdapter(countdownRows));
+        final CountdownListAdapter cla = new CountdownListAdapter(countdownRows);
+        binding.listCountdowns.setAdapter(cla);
+        cla.setOnClickListener((position, model) -> {
+            Intent modifyIntent = new Intent(getActivity(), CreateActivity.class);
+            modifyIntent.putExtra(CreateFragment.MODIFY_MODEL, model);
+            requireActivity().startActivity(modifyIntent);
+        });
         if (countdownRows.isEmpty()) {
             binding.textHome.setVisibility(View.VISIBLE);
             binding.listCountdowns.setVisibility(View.GONE);

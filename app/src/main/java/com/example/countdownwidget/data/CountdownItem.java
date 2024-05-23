@@ -1,11 +1,12 @@
 package com.example.countdownwidget.data;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class CountdownItem implements Comparable<CountdownItem> {
+public class CountdownItem implements Comparable<CountdownItem>, Serializable {
     private final long mId;
     private final String mName;
     private final Calendar mDate;
@@ -36,8 +37,16 @@ public class CountdownItem implements Comparable<CountdownItem> {
         return mName;
     }
 
+    public Calendar getDate() {
+        return mDate;
+    }
+
     public String getDateText() {
         return mDateText;
+    }
+
+    public Calendar getTime() {
+        return mTime;
     }
 
     public String getTimeText() {

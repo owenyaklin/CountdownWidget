@@ -20,11 +20,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.countdownwidget.R;
 import com.example.countdownwidget.data.CountdownDatabase;
+import com.example.countdownwidget.data.CountdownItem;
 import com.example.countdownwidget.databinding.FragmentCreateBinding;
 
 import java.util.TimeZone;
 
 public class CreateFragment extends Fragment {
+    public static final String MODIFY_MODEL = "ModifyModel";
     private CreateViewModel mViewModel;
     private FragmentCreateBinding binding;
     private CountdownDatabase mDatabase;
@@ -44,6 +46,13 @@ public class CreateFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         mViewModel = new ViewModelProvider(this).get(CreateViewModel.class);
+        Bundle intentExtras = requireActivity().getIntent().getExtras();
+        if (intentExtras != null) {
+            CountdownItem modifyItem = intentExtras.getSerializable(MODIFY_MODEL, CountdownItem.class);
+            if (modifyItem != null) {
+                mViewModel.importCountdownItem(modifyItem);
+            }
+        }
         binding = FragmentCreateBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         final EditText textName = binding.fragmentCreateName;

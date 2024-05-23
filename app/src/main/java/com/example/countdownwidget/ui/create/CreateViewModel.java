@@ -1,7 +1,10 @@
 package com.example.countdownwidget.ui.create;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.example.countdownwidget.data.CountdownItem;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -10,7 +13,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
-
 public class CreateViewModel extends ViewModel {
     private final MutableLiveData<String> mName;
     private final MutableLiveData<Calendar> mDate;
@@ -18,6 +20,7 @@ public class CreateViewModel extends ViewModel {
     private final MutableLiveData<Calendar> mTime;
     private final MutableLiveData<String> mTimeText;
     private final MutableLiveData<String> mTimeZone;
+    private Long itemId;
 
     public CreateViewModel() {
         mName = new MutableLiveData<>("");
@@ -30,6 +33,7 @@ public class CreateViewModel extends ViewModel {
         Date mTimeDate = Objects.requireNonNull(mTime.getValue()).getTime();
         mTimeText = new MutableLiveData<>(timeSdf.format(mTimeDate));
         mTimeZone = new MutableLiveData<>(TimeZone.getDefault().getID());
+        itemId = null;
     }
 
     public MutableLiveData<String> getName() {
@@ -54,6 +58,16 @@ public class CreateViewModel extends ViewModel {
 
     public MutableLiveData<String> getTimeZone() {
         return mTimeZone;
+    }
+
+    public void importCountdownItem(@NonNull CountdownItem importItem) {
+        itemId = importItem.getId();
+        mName.setValue(importItem.getName());
+        mDate.setValue(importItem.getDate());
+        mDateText.setValue(importItem.getDateText());
+        mTime.setValue(importItem.getTime());
+        mTimeText.setValue(importItem.getTimeText());
+        mTimeZone.setValue(importItem.getTimeZone());
     }
 
 }

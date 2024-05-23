@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 public class CountdownListAdapter extends RecyclerView.Adapter<CountdownListItem> {
     private final ArrayList<CountdownItem> values;
+    private OnClickListener onClickListener;
 
     public CountdownListAdapter(ArrayList<CountdownItem> values) {
         this.values = values;
@@ -41,10 +42,24 @@ public class CountdownListAdapter extends RecyclerView.Adapter<CountdownListItem
         String timeText = positionItem.getTimeText();
         String dateTimeText = dateText + " " + timeText;
         holder.getDateTimeTextView().setText(dateTimeText);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (onClickListener != null) {
+                onClickListener.onClick(position, positionItem);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return values.size();
+    }
+
+    public void setOnClickListener(OnClickListener onClickListener) {
+        this.onClickListener = onClickListener;
+    }
+
+    public interface OnClickListener {
+        void onClick(int position, CountdownItem model);
     }
 }
