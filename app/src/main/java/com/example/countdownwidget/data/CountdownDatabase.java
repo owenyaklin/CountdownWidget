@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.example.countdownwidget.ui.create.CreateViewModel;
 
 import java.util.ArrayList;
@@ -21,17 +23,38 @@ public class CountdownDatabase {
         sqliteOpenHelper = new CountdownSqliteOpenHelper(context);
     }
 
+    @NonNull
+    private static ContentValues insertContentValues(CreateViewModel updateModel) {
+        ContentValues values = new ContentValues();
+        values.put(CountdownContract.Countdown.COLUMN_NAME_NAME, updateModel.getName().getValue());
+        values.put(CountdownContract.Countdown.COLUMN_NAME_DATE,
+                Objects.requireNonNull(updateModel.getDate().getValue()).getTimeInMillis());
+        values.put(CountdownContract.Countdown.COLUMN_NAME_TIME,
+                Objects.requireNonNull(updateModel.getTime().getValue()).getTimeInMillis());
+        values.put(CountdownContract.Countdown.COLUMN_NAME_TIME_ZONE, updateModel.getTimeZone().getValue());
+        return values;
+    }
+
     public void writeNewCountdown(CreateViewModel newModel) {
         try {
             SQLiteDatabase database = sqliteOpenHelper.getWritableDatabase();
-            ContentValues insertValues = new ContentValues();
-            insertValues.put(CountdownContract.Countdown.COLUMN_NAME_NAME, newModel.getName().getValue());
-            insertValues.put(CountdownContract.Countdown.COLUMN_NAME_DATE,
-                    Objects.requireNonNull(newModel.getDate().getValue()).getTimeInMillis());
-            insertValues.put(CountdownContract.Countdown.COLUMN_NAME_TIME,
-                    Objects.requireNonNull(newModel.getTime().getValue()).getTimeInMillis());
-            insertValues.put(CountdownContract.Countdown.COLUMN_NAME_TIME_ZONE, newModel.getTimeZone().getValue());
+            ContentValues insertValues = insertContentValues(newModel);
             database.insert(CountdownContract.Countdown.TABLE_NAME, null, insertValues);
+        } catch (Exception e) {
+            Log.e(LOG, e.toString());
+        }
+    }
+
+    public void updateCountdown(CreateViewModel updateModel) {
+        try {
+            SQLiteDatabase database = sqliteOpenHelper.getWritableDatabase();
+            ContentValues updateValues = insertContentValues(updateModel);
+
+            // Which row to update, based on the title
+            String selection = CountdownContract.Countdown._ID + " = ?";
+            String[] selectionArgs = {updateModel.getItemId().toString()};
+
+            database.update(CountdownContract.Countdown.TABLE_NAME, updateValues, selection, selectionArgs);
         } catch (Exception e) {
             Log.e(LOG, e.toString());
         }

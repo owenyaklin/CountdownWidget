@@ -16,9 +16,11 @@
     <string name="menu_help">Help</string>
 
     <string name="activity_create_title">Create Countdown</string>
+    <string name="activity_update_title">Update Countdown</string>
     <string name="fragment_create_name_hint">Countdown Name</string>
     <string name="fragment_create_name">Name</string>
     <string name="fragment_create_date">Date</string>
     <string name="fragment_create_time">Time</string>
     <string name="fragment_create_create">Create</string>
+    <string name="fragment_create_update">Update</string>
 </resources>

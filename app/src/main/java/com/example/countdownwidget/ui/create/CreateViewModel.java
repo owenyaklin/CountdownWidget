@@ -60,6 +60,10 @@ public class CreateViewModel extends ViewModel {
         return mTimeZone;
     }
 
+    public Long getItemId() {
+        return itemId;
+    }
+
     public void importCountdownItem(@NonNull CountdownItem importItem) {
         itemId = importItem.getId();
         mName.setValue(importItem.getName());

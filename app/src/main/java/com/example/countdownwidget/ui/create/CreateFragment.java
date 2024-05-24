@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -104,10 +105,19 @@ public class CreateFragment extends Fragment {
             }
         });
         binding.fragmentCreateCreate.setOnClickListener(v -> {
-            mDatabase.writeNewCountdown(mViewModel);
+            if (mViewModel.getItemId() == null) {
+                mDatabase.writeNewCountdown(mViewModel);
+            } else {
+                mDatabase.updateCountdown(mViewModel);
+            }
             requireActivity().setResult(Activity.RESULT_OK);
             requireActivity().finish();
         });
+        if (mViewModel.getItemId() != null) {
+            binding.fragmentCreateCreate.setText(R.string.fragment_create_update);
+            Toolbar creatToolbar = requireActivity().findViewById(R.id.toolbar_create);
+            creatToolbar.setTitle(R.string.activity_update_title);
+        }
 
         mDatabase = new CountdownDatabase(getActivity());
 
