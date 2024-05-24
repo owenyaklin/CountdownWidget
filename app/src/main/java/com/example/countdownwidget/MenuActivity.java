@@ -23,7 +23,7 @@ public class MenuActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMenuBinding binding;
     private FragmentRefreshListener fragmentRefreshListener;
-    ActivityResultLauncher<Intent> createActivityResultLauncher =
+    private final ActivityResultLauncher<Intent> createActivityResultLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
             // There are no request codes
