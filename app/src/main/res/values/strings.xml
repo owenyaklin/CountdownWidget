@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Countdown Widget</string>
-    <string name="header">Atlantic City Marathon</string>
     <string name="appwidget_text">Atlantic City Marathon</string>
     <string name="add_widget">Add widget</string>
     <string name="app_widget_description">Basic widget for displaying the countdown</string>
@@ -15,6 +14,7 @@
     <string name="menu_home">Home</string>
     <string name="menu_help">Help</string>
 
+    <string name="activity_main_header">Default Title</string>
     <string name="activity_create_title">Create Countdown</string>
     <string name="activity_update_title">Update Countdown</string>
     <string name="fragment_create_name_hint">Countdown Name</string>
