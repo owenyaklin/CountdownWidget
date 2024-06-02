@@ -28,8 +28,6 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private CountdownDatabase mDatabase;
 
-    private ActivityResultLauncher<Intent> createActivityResultLauncher;
-
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
@@ -43,13 +41,6 @@ public class HomeFragment extends Fragment {
         queryCountdowns();
 
         ((MenuActivity) requireActivity()).setFragmentRefreshListener(this::queryCountdowns);
-
-        createActivityResultLauncher =
-                requireActivity().registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == Activity.RESULT_OK) {
-                queryCountdowns();
-            }
-        });
 
         return root;
     }
@@ -77,4 +68,12 @@ public class HomeFragment extends Fragment {
             binding.listCountdowns.setVisibility(View.VISIBLE);
         }
     }
+
+    private final ActivityResultLauncher<Intent> createActivityResultLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            queryCountdowns();
+        }
+    });
+
 }
