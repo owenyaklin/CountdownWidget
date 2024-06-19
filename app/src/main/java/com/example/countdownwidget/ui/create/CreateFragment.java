@@ -1,6 +1,7 @@
 package com.example.countdownwidget.ui.create;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -110,7 +111,16 @@ public class CreateFragment extends Fragment {
             } else {
                 mDatabase.updateCountdown(mViewModel);
             }
-            requireActivity().setResult(Activity.RESULT_OK);
+            if (mViewModel.getItemId() != null) {
+                CountdownItem resultItem = new CountdownItem(mViewModel.getItemId(), mViewModel.getName().getValue(),
+                        mViewModel.getDate().getValue(), mViewModel.getTime().getValue(),
+                        mViewModel.getTimeZone().getValue());
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra(MODIFY_MODEL, resultItem);
+                requireActivity().setResult(Activity.RESULT_OK, resultIntent);
+            } else {
+                requireActivity().setResult(Activity.RESULT_OK);
+            }
             requireActivity().finish();
         });
         if (mViewModel.getItemId() != null) {

@@ -58,7 +58,7 @@ public class HomeFragment extends Fragment {
         cla.setOnClickListener((position, model) -> {
             Intent modifyIntent = new Intent(getActivity(), MainActivity.class);
             modifyIntent.putExtra(MainActivity.DISPLAY_MODEL, model);
-            createActivityResultLauncher.launch(modifyIntent);
+            mainActivityResultLauncher.launch(modifyIntent);
         });
         if (countdownRows.isEmpty()) {
             binding.textHome.setVisibility(View.VISIBLE);
@@ -69,7 +69,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private final ActivityResultLauncher<Intent> createActivityResultLauncher =
+    private final ActivityResultLauncher<Intent> mainActivityResultLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
             queryCountdowns();

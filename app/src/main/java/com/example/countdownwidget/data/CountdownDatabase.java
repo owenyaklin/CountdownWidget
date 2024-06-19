@@ -50,11 +50,25 @@ public class CountdownDatabase {
             SQLiteDatabase database = sqliteOpenHelper.getWritableDatabase();
             ContentValues updateValues = insertContentValues(updateModel);
 
-            // Which row to update, based on the title
+            // Which row to update, based on the ID
             String selection = CountdownContract.Countdown._ID + " = ?";
             String[] selectionArgs = {updateModel.getItemId().toString()};
 
             database.update(CountdownContract.Countdown.TABLE_NAME, updateValues, selection, selectionArgs);
+        } catch (Exception e) {
+            Log.e(LOG, e.toString());
+        }
+    }
+
+    public void deleteCountdown(CountdownItem deleteItem) {
+        try {
+            SQLiteDatabase database = sqliteOpenHelper.getWritableDatabase();
+
+            // Which row to update, based on the ID
+            String selection = CountdownContract.Countdown._ID + " = ?";
+            String[] selectionArgs = {Long.toString(deleteItem.getId())};
+
+            database.delete(CountdownContract.Countdown.TABLE_NAME, selection, selectionArgs);
         } catch (Exception e) {
             Log.e(LOG, e.toString());
         }

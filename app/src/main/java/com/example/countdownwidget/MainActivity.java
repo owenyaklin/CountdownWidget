@@ -1,18 +1,25 @@
 package com.example.countdownwidget;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.countdownwidget.data.CountdownDatabase;
 import com.example.countdownwidget.data.CountdownItem;
 import com.example.countdownwidget.databinding.ActivityMainBinding;
+import com.example.countdownwidget.ui.create.CreateFragment;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -24,9 +31,23 @@ public class MainActivity extends AppCompatActivity {
     private static final String LOG = "MainActivity";
     private static boolean keepRunning = false;
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private CountdownItem baseItem = null;
     private ActivityMainBinding binding;
     private TimeZone countdownTimeZone = TimeZone.getDefault();
     private ZonedDateTime targetTime = ZonedDateTime.of(2040, 1, 1, 0, 0, 0, 0, countdownTimeZone.toZoneId());
+    private final ActivityResultLauncher<Intent> createActivityResultLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            if (result.getData() != null) {
+                Bundle intentExtras = result.getData().getExtras();
+                if (intentExtras != null) {
+                    baseItem = intentExtras.getSerializable(CreateFragment.MODIFY_MODEL, CountdownItem.class);
+                    setCountdownValues();
+                }
+            }
+        }
+    });
+    private CountdownDatabase mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,18 +65,38 @@ public class MainActivity extends AppCompatActivity {
         if (intentExtras != null) {
             CountdownItem modifyItem = intentExtras.getSerializable(DISPLAY_MODEL, CountdownItem.class);
             if (modifyItem != null) {
-                binding.headerText.setText(modifyItem.getName());
-                countdownTimeZone = TimeZone.getTimeZone(modifyItem.getTimeZone());
-                Calendar newDate = modifyItem.getDate();
-                Calendar newTime = modifyItem.getTime();
-                targetTime = ZonedDateTime.of(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH) + 1,
-                        newDate.get(Calendar.DAY_OF_MONTH), newTime.get(Calendar.HOUR_OF_DAY),
-                        newTime.get(Calendar.MINUTE), 0, 0, countdownTimeZone.toZoneId());
+                baseItem = modifyItem;
+                setCountdownValues();
             }
         }
+        binding.mainEditButton.setOnClickListener(v -> {
+            Intent modifyIntent = new Intent(this, CreateActivity.class);
+            modifyIntent.putExtra(CreateFragment.MODIFY_MODEL, baseItem);
+            createActivityResultLauncher.launch(modifyIntent);
+        });
+        binding.mainDeleteButton.setOnClickListener(v -> new AlertDialog.Builder(this).setTitle(R.string.activity_main_confirmation_title).setMessage(R.string.activity_main_confirmation_message).setPositiveButton(R.string.activity_main_confirmation_yes, (dialog, which) -> {
+            if (baseItem != null) {
+                mDatabase.deleteCountdown(baseItem);
+            }
+            setResult(Activity.RESULT_OK);
+            finish();
+        }).setNegativeButton(R.string.activity_main_confirmation_no, null).show());
         calculateCountdown();
+        mDatabase = new CountdownDatabase(this);
         keepRunning = true;
         doTheAutoRefresh();
+    }
+
+    private void setCountdownValues() {
+        if (baseItem != null) {
+            binding.headerText.setText(baseItem.getName());
+            countdownTimeZone = TimeZone.getTimeZone(baseItem.getTimeZone());
+            Calendar newDate = baseItem.getDate();
+            Calendar newTime = baseItem.getTime();
+            targetTime = ZonedDateTime.of(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH) + 1,
+                    newDate.get(Calendar.DAY_OF_MONTH), newTime.get(Calendar.HOUR_OF_DAY), newTime.get(Calendar.MINUTE), 0
+                    , 0, countdownTimeZone.toZoneId());
+        }
     }
 
     @Override
