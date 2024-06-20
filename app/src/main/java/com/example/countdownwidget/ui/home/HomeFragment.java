@@ -1,7 +1,10 @@
 package com.example.countdownwidget.ui.home;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +28,8 @@ import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
 
+    public static final String REFRESH_LIST = "HomeFragment_refreshList";
+
     private FragmentHomeBinding binding;
     private CountdownDatabase mDatabase;
 
@@ -42,6 +47,8 @@ public class HomeFragment extends Fragment {
 
         ((MenuActivity) requireActivity()).setFragmentRefreshListener(this::queryCountdowns);
 
+        requireActivity().registerReceiver(mMessageReceiver, new IntentFilter(REFRESH_LIST), Context.RECEIVER_NOT_EXPORTED);
+
         return root;
     }
 
@@ -49,6 +56,7 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+        requireActivity().unregisterReceiver(mMessageReceiver);
     }
 
     private void queryCountdowns() {
@@ -68,6 +76,13 @@ public class HomeFragment extends Fragment {
             binding.listCountdowns.setVisibility(View.VISIBLE);
         }
     }
+
+    private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            queryCountdowns();
+        }
+    };
 
     private final ActivityResultLauncher<Intent> mainActivityResultLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {

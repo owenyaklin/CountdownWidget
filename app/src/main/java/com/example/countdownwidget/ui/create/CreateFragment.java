@@ -24,6 +24,7 @@ import com.example.countdownwidget.R;
 import com.example.countdownwidget.data.CountdownDatabase;
 import com.example.countdownwidget.data.CountdownItem;
 import com.example.countdownwidget.databinding.FragmentCreateBinding;
+import com.example.countdownwidget.ui.home.HomeFragment;
 
 import java.util.TimeZone;
 
@@ -112,6 +113,11 @@ public class CreateFragment extends Fragment {
                 mDatabase.updateCountdown(mViewModel);
             }
             if (mViewModel.getItemId() != null) {
+                // First make sure the HomeFragment list refreshes
+                Intent broadcastIntent = new Intent(HomeFragment.REFRESH_LIST);
+                broadcastIntent.setPackage(requireContext().getPackageName());
+                requireActivity().sendBroadcast(broadcastIntent);
+                // Then send the result back parent activity
                 CountdownItem resultItem = new CountdownItem(mViewModel.getItemId(), mViewModel.getName().getValue(),
                         mViewModel.getDate().getValue(), mViewModel.getTime().getValue(),
                         mViewModel.getTimeZone().getValue());
