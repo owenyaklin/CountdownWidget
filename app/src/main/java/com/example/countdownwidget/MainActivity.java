@@ -123,50 +123,54 @@ public class MainActivity extends AppCompatActivity {
         ZonedDateTime nowTime = ZonedDateTime.now();
         // ZonedDateTime nowZoned = ZonedDateTime.now(countdownTimeZone.toZoneId());
         Duration difference = Duration.between(nowTime, targetTime);
-        long differenceDays = difference.toDays();
-        difference = difference.minusDays(differenceDays);
-        long differenceHours = difference.toHours();
-        difference = difference.minusHours(differenceHours);
-        long differenceMinutes = difference.toMinutes();
-        difference = difference.minusMinutes(differenceMinutes);
-        if (difference.getSeconds() > 0) differenceMinutes += 1;
-        if (differenceMinutes == 60) {
-            differenceMinutes = 0;
-            differenceHours += 1;
-            if (differenceHours == 24) {
-                differenceHours = 0;
-                differenceDays += 1;
+        if (difference.getSeconds() > 0) {
+            long differenceDays = difference.toDays();
+            difference = difference.minusDays(differenceDays);
+            long differenceHours = difference.toHours();
+            difference = difference.minusHours(differenceHours);
+            long differenceMinutes = difference.toMinutes();
+            difference = difference.minusMinutes(differenceMinutes);
+            if (difference.getSeconds() > 0) differenceMinutes += 1;
+            if (differenceMinutes == 60) {
+                differenceMinutes = 0;
+                differenceHours += 1;
+                if (differenceHours == 24) {
+                    differenceHours = 0;
+                    differenceDays += 1;
+                }
             }
-        }
-        StringBuilder countdownString = new StringBuilder();
-        boolean started = false;
-        if (differenceDays > 0) {
-            countdownString.append(differenceDays);
-            if (differenceDays == 1) {
-                countdownString.append(" Day, ");
-            } else {
-                countdownString.append(" Days, ");
+            StringBuilder countdownString = new StringBuilder();
+            boolean started = false;
+            if (differenceDays > 0) {
+                countdownString.append(differenceDays);
+                if (differenceDays == 1) {
+                    countdownString.append(" Day, ");
+                } else {
+                    countdownString.append(" Days, ");
+                }
+                started = true;
             }
-            started = true;
-        }
-        if (started || differenceHours > 0) {
-            countdownString.append(differenceHours);
-            if (differenceHours == 1) {
-                countdownString.append(" Hour, ");
-            } else {
-                countdownString.append(" Hours, ");
+            if (started || differenceHours > 0) {
+                countdownString.append(differenceHours);
+                if (differenceHours == 1) {
+                    countdownString.append(" Hour, ");
+                } else {
+                    countdownString.append(" Hours, ");
+                }
+                started = true;
             }
-            started = true;
-        }
-        if (started || differenceMinutes > 0) {
-            countdownString.append(differenceMinutes);
-            if (differenceMinutes == 1) {
-                countdownString.append(" Minute");
-            } else {
-                countdownString.append(" Minutes");
+            if (started || differenceMinutes > 0) {
+                countdownString.append(differenceMinutes);
+                if (differenceMinutes == 1) {
+                    countdownString.append(" Minute");
+                } else {
+                    countdownString.append(" Minutes");
+                }
             }
+            String finalString = countdownString.toString();
+            binding.countdownText.setText(finalString);
+        } else {
+            binding.countdownText.setText(R.string.activity_main_expired);
         }
-        String finalString = countdownString.toString();
-        binding.countdownText.setText(finalString);
     }
 }
