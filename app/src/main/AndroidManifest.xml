@@ -11,6 +11,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CountdownWidget">
         <activity
+            android:name=".CountdownWidgetConfigurationActivity"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".CreateActivity"
             android:exported="false"
             android:parentActivityName=".MenuActivity" />

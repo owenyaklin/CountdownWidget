@@ -8,6 +8,7 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.countdownwidget.ui.create.CreateViewModel;
 
@@ -109,5 +110,42 @@ public class CountdownDatabase {
             Log.e(LOG, e.toString());
         }
         return returnItems;
+    }
+
+    @Nullable
+    public CountdownItem getCountdown(long countdownId) {
+        CountdownItem returnItem = null;
+        try {
+            SQLiteDatabase database = sqliteOpenHelper.getReadableDatabase();
+            String[] projection = {BaseColumns._ID, CountdownContract.Countdown.COLUMN_NAME_NAME,
+                    CountdownContract.Countdown.COLUMN_NAME_DATE, CountdownContract.Countdown.COLUMN_NAME_TIME,
+                    CountdownContract.Countdown.COLUMN_NAME_TIME_ZONE};
+
+            String whereColumns = BaseColumns._ID + " = ?";
+            String[] whereValues = {Long.toString(countdownId)};
+
+            Cursor cursor = database.query(CountdownContract.Countdown.TABLE_NAME,   // The table to query
+                    projection,             // The array of columns to return (pass null to get all)
+                    whereColumns,                   // The columns for the WHERE clause
+                    whereValues,                   // The values for the WHERE clause
+                    null,                   // don't group the rows
+                    null,                   // don't filter by row groups
+                    null               // The sort order
+            );
+            if (cursor.moveToFirst()) {
+                long itemId = cursor.getLong(0);
+                String itemName = cursor.getString(1);
+                Calendar itemDate = Calendar.getInstance();
+                itemDate.setTimeInMillis(cursor.getLong(2));
+                Calendar itemTime = Calendar.getInstance();
+                itemTime.setTimeInMillis(cursor.getLong(3));
+                String itemTimeZone = cursor.getString(4);
+                returnItem = new CountdownItem(itemId, itemName, itemDate, itemTime, itemTimeZone);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            Log.e(LOG, e.toString());
+        }
+        return returnItem;
     }
 }
