@@ -7,7 +7,7 @@
     android:minWidth="250dp"
     android:minHeight="40dp"
     android:previewImage="@drawable/example_appwidget_preview"
-    android:previewLayout="@layout/countdown_widget_provider"
+    android:previewLayout="@layout/countdown_widget_provider_preview"
     android:resizeMode="horizontal|vertical"
     android:targetCellWidth="5"
     android:targetCellHeight="1"

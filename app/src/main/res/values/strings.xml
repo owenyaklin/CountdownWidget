@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Countdown Widget</string>
+    <string name="appwidget_content_description">Title of the countdown being displayed.</string>
     <string name="appwidget_text">Default Title</string>
+    <string name="appwidget_text_preview">Example Title</string>
+    <string name="appwidget_countdown_text_preview">5 Days, 21 Hours, 37 Minutes</string>
     <string name="add_widget">Add widget</string>
     <string name="app_widget_description">Basic widget for displaying the countdown</string>
     <string name="title_activity_menu">MenuActivity</string>

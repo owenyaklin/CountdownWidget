@@ -18,8 +18,8 @@
             android:layout_margin="2dp"
             android:contentDescription="@string/appwidget_content_description"
             android:padding="4dp"
-            android:text="@string/appwidget_text"
-            android:textColor="@android:color/white"
+            android:text="@string/appwidget_text_preview"
+            android:textColor="@android:color/black"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -32,8 +32,9 @@
             android:layout_marginTop="1dp"
             android:background="@drawable/app_widget_inner_view_background"
             android:padding="4dp"
+            android:text="@string/appwidget_countdown_text_preview"
             android:textAppearance="@android:style/TextAppearance.Material.Medium"
-            android:textColor="@color/white" />
+            android:textColor="@color/black" />
     </RelativeLayout>
 
 </RelativeLayout>
