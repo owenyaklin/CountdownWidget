@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -37,16 +38,16 @@ public class MainActivity extends AppCompatActivity {
     private ZonedDateTime targetTime = ZonedDateTime.of(2040, 1, 1, 0, 0, 0, 0, countdownTimeZone.toZoneId());
     private final ActivityResultLauncher<Intent> createActivityResultLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == Activity.RESULT_OK) {
-            if (result.getData() != null) {
-                Bundle intentExtras = result.getData().getExtras();
-                if (intentExtras != null) {
-                    baseItem = intentExtras.getSerializable(CreateFragment.MODIFY_MODEL, CountdownItem.class);
-                    setCountdownValues();
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    if (result.getData() != null) {
+                        Bundle intentExtras = result.getData().getExtras();
+                        if (intentExtras != null) {
+                            baseItem = intentExtras.getSerializable(CreateFragment.MODIFY_MODEL, CountdownItem.class);
+                            setCountdownValues();
+                        }
+                    }
                 }
-            }
-        }
-    });
+            });
     private CountdownDatabase mDatabase;
 
     @Override
@@ -74,13 +75,16 @@ public class MainActivity extends AppCompatActivity {
             modifyIntent.putExtra(CreateFragment.MODIFY_MODEL, baseItem);
             createActivityResultLauncher.launch(modifyIntent);
         });
-        binding.mainDeleteButton.setOnClickListener(v -> new AlertDialog.Builder(this).setTitle(R.string.activity_main_confirmation_title).setMessage(R.string.activity_main_confirmation_message).setPositiveButton(R.string.activity_main_confirmation_yes, (dialog, which) -> {
-            if (baseItem != null) {
-                mDatabase.deleteCountdown(baseItem);
-            }
-            setResult(Activity.RESULT_OK);
-            finish();
-        }).setNegativeButton(R.string.activity_main_confirmation_no, null).show());
+        binding.mainDeleteButton.setOnClickListener(
+                v -> new AlertDialog.Builder(this).setTitle(R.string.activity_main_confirmation_title)
+                        .setMessage(R.string.activity_main_confirmation_message)
+                        .setPositiveButton(R.string.activity_main_confirmation_yes, (dialog, which) -> {
+                            if (baseItem != null) {
+                                mDatabase.deleteCountdown(baseItem);
+                            }
+                            setResult(Activity.RESULT_OK);
+                            finish();
+                        }).setNegativeButton(R.string.activity_main_confirmation_no, null).show());
         calculateCountdown();
         mDatabase = new CountdownDatabase(this);
         keepRunning = true;
@@ -94,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
             Calendar newDate = baseItem.getDate();
             Calendar newTime = baseItem.getTime();
             targetTime = ZonedDateTime.of(newDate.get(Calendar.YEAR), newDate.get(Calendar.MONTH) + 1,
-                    newDate.get(Calendar.DAY_OF_MONTH), newTime.get(Calendar.HOUR_OF_DAY), newTime.get(Calendar.MINUTE), 0
-                    , 0, countdownTimeZone.toZoneId());
+                    newDate.get(Calendar.DAY_OF_MONTH), newTime.get(Calendar.HOUR_OF_DAY), newTime.get(Calendar.MINUTE), 0,
+                    0, countdownTimeZone.toZoneId());
         }
     }
 
@@ -116,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
             if (keepRunning) {
                 doTheAutoRefresh();
             }
-        }, 1000);
+        }, DateUtils.MINUTE_IN_MILLIS - System.currentTimeMillis() % DateUtils.MINUTE_IN_MILLIS);
     }
 
     private void calculateCountdown() {

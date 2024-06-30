@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -86,6 +87,7 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
     }
 
     private void doTheAutoRefresh(Context context) {
+        long triggerInterval = DateUtils.MINUTE_IN_MILLIS / 6;
         handler.postDelayed(() -> {
             // Write code for your refresh logic
             Log.d(LOG, "doTheAutoRefresh");
@@ -93,7 +95,7 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
             if (keepRunning) {
                 doTheAutoRefresh(context);
             }
-        }, 1000);
+        }, triggerInterval - System.currentTimeMillis() % triggerInterval);
     }
 
     private void sendUpdateIntent(Context context) {
