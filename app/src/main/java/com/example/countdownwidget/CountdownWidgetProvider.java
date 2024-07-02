@@ -86,6 +86,16 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
         edit.apply();
     }
 
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
+        Log.d(LOG, "onReceive, " + intent.getAction());
+        if (intent.getAction() != null && intent.getAction().equalsIgnoreCase(Intent.ACTION_MY_PACKAGE_REPLACED)) {
+            keepRunning = true;
+            doTheAutoRefresh(context);
+        }
+    }
+
     private void doTheAutoRefresh(Context context) {
         long triggerInterval = DateUtils.MINUTE_IN_MILLIS / 6;
         handler.postDelayed(() -> {
