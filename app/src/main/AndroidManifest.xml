@@ -10,6 +10,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CountdownWidget">
+
+        <service
+            android:name=".service.WidgetUpdateService"
+            android:enabled="true"
+            android:exported="false" />
+
         <activity
             android:name=".CountdownWidgetConfigurationActivity"
             android:exported="false">

@@ -87,6 +87,14 @@ public class CountdownWidgetConfigurationActivity extends AppCompatActivity {
             long differenceMinutes = difference.toMinutes();
             difference = difference.minusMinutes(differenceMinutes);
             if (difference.getSeconds() > 0) differenceMinutes += 1;
+            if (differenceMinutes == 60) {
+                differenceMinutes = 0;
+                differenceHours += 1;
+                if (differenceHours == 24) {
+                    differenceHours = 0;
+                    differenceDays += 1;
+                }
+            }
             StringBuilder countdownString = new StringBuilder();
             boolean started = false;
             if (differenceDays > 0) {

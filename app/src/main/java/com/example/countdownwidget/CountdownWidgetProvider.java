@@ -2,18 +2,17 @@ package com.example.countdownwidget;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.ComponentName;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Looper;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.example.countdownwidget.data.CountdownDatabase;
 import com.example.countdownwidget.data.CountdownItem;
+import com.example.countdownwidget.service.WidgetUpdateService;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -24,9 +23,24 @@ import java.util.TimeZone;
  * Implementation of App Widget functionality.
  */
 public class CountdownWidgetProvider extends AppWidgetProvider {
+
+    public static final String WIDGET_RUNNING = "WidgetRunning";
+
     private static final String LOG = "CountdownWidgetProvider";
-    private static boolean keepRunning = true;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private static final BroadcastReceiver screenOnReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(LOG, "screenOnReceiver, onReceive " + intent.getAction());
+            context.startService(new Intent(context.getApplicationContext(), WidgetUpdateService.class));
+        }
+    };
+
+    private static void setWidgetRunning(Context context, boolean value) {
+        SharedPreferences prefs = context.getSharedPreferences(CountdownWidgetConfigurationActivity.PREFS_NAME, 0);
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.putBoolean(WIDGET_RUNNING, value);
+        edit.apply();
+    }
 
     void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
 
@@ -63,16 +77,21 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
     public void onEnabled(Context context) {
         // Enter relevant functionality for when the first widget is created
         Log.d(LOG, "onEnabled");
-        keepRunning = true;
-        doTheAutoRefresh(context);
+        setWidgetRunning(context, true);
+        context.startService(new Intent(context.getApplicationContext(), WidgetUpdateService.class));
+        context.getApplicationContext().registerReceiver(screenOnReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
     }
 
     @Override
     public void onDisabled(Context context) {
         // Enter relevant functionality for when the last widget is disabled
         Log.d(LOG, "onDisabled");
-        keepRunning = false;
-        handler.removeCallbacksAndMessages(null);
+        setWidgetRunning(context, false);
+        try {
+            context.getApplicationContext().unregisterReceiver(screenOnReceiver);
+        } catch (IllegalArgumentException e) {
+            Log.e(LOG, e.toString());
+        }
     }
 
     @Override
@@ -91,33 +110,8 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
         super.onReceive(context, intent);
         Log.d(LOG, "onReceive, " + intent.getAction());
         if (intent.getAction() != null && intent.getAction().equalsIgnoreCase(Intent.ACTION_MY_PACKAGE_REPLACED)) {
-            keepRunning = true;
-            doTheAutoRefresh(context);
+            setWidgetRunning(context, true);
         }
-    }
-
-    private void doTheAutoRefresh(Context context) {
-        long triggerInterval = DateUtils.MINUTE_IN_MILLIS / 6;
-        handler.postDelayed(() -> {
-            // Write code for your refresh logic
-            Log.d(LOG, "doTheAutoRefresh");
-            sendUpdateIntent(context);
-            if (keepRunning) {
-                doTheAutoRefresh(context);
-            }
-        }, triggerInterval - System.currentTimeMillis() % triggerInterval);
-    }
-
-    private void sendUpdateIntent(Context context) {
-        Intent intent = new Intent(context.getApplicationContext(), CountdownWidgetProvider.class);
-        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        // Use an array and EXTRA_APPWIDGET_IDS instead of AppWidgetManager.EXTRA_APPWIDGET_ID,
-        // since it seems the onUpdate() is only fired on that:
-        AppWidgetManager widgetManager = AppWidgetManager.getInstance(context);
-        int[] ids = widgetManager.getAppWidgetIds(new ComponentName(context, CountdownWidgetProvider.class));
-
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-        context.sendBroadcast(intent);
     }
 
     private String calculateCountdown(Context context, CountdownItem model) {
@@ -137,6 +131,14 @@ public class CountdownWidgetProvider extends AppWidgetProvider {
             long differenceMinutes = difference.toMinutes();
             difference = difference.minusMinutes(differenceMinutes);
             if (difference.getSeconds() > 0) differenceMinutes += 1;
+            if (differenceMinutes == 60) {
+                differenceMinutes = 0;
+                differenceHours += 1;
+                if (differenceHours == 24) {
+                    differenceHours = 0;
+                    differenceDays += 1;
+                }
+            }
             StringBuilder countdownString = new StringBuilder();
             boolean started = false;
             if (differenceDays > 0) {
