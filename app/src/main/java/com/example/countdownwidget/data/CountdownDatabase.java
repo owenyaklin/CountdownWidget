@@ -15,6 +15,7 @@ import com.example.countdownwidget.ui.create.CreateViewModel;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
+import java.util.TimeZone;
 
 public class CountdownDatabase {
     private static final String LOG = "CountdownDatabase";
@@ -29,11 +30,34 @@ public class CountdownDatabase {
         ContentValues values = new ContentValues();
         values.put(CountdownContract.Countdown.COLUMN_NAME_NAME, updateModel.getName().getValue());
         values.put(CountdownContract.Countdown.COLUMN_NAME_DATE,
-                Objects.requireNonNull(updateModel.getDate().getValue()).getTimeInMillis());
+                convertToGMT(Objects.requireNonNull(updateModel.getDate().getValue()).getTimeInMillis()));
         values.put(CountdownContract.Countdown.COLUMN_NAME_TIME,
-                Objects.requireNonNull(updateModel.getTime().getValue()).getTimeInMillis());
+                convertToGMT(Objects.requireNonNull(updateModel.getTime().getValue()).getTimeInMillis()));
         values.put(CountdownContract.Countdown.COLUMN_NAME_TIME_ZONE, updateModel.getTimeZone().getValue());
         return values;
+    }
+
+    private static CountdownItem retrieveContentValues(Cursor cursor) {
+        long itemId = cursor.getLong(0);
+        String itemName = cursor.getString(1);
+        Calendar itemDate = Calendar.getInstance();
+        itemDate.setTimeInMillis(convertFromGMT(cursor.getLong(2)));
+        Calendar itemTime = Calendar.getInstance();
+        itemTime.setTimeInMillis(convertFromGMT(cursor.getLong(3)));
+        String itemTimeZone = cursor.getString(4);
+        return new CountdownItem(itemId, itemName, itemDate, itemTime, itemTimeZone);
+    }
+
+    private static long convertToGMT(long toConvert) {
+        TimeZone currentTimeZone = TimeZone.getDefault();
+        long currentOffset = currentTimeZone.getOffset(System.currentTimeMillis());
+        return toConvert + currentOffset;
+    }
+
+    private static long convertFromGMT(long toConvert) {
+        TimeZone currentTimeZone = TimeZone.getDefault();
+        long currentOffset = currentTimeZone.getOffset(System.currentTimeMillis());
+        return toConvert - currentOffset;
     }
 
     public void writeNewCountdown(CreateViewModel newModel) {
@@ -95,14 +119,7 @@ public class CountdownDatabase {
             );
             if (cursor.moveToFirst()) {
                 do {
-                    long itemId = cursor.getLong(0);
-                    String itemName = cursor.getString(1);
-                    Calendar itemDate = Calendar.getInstance();
-                    itemDate.setTimeInMillis(cursor.getLong(2));
-                    Calendar itemTime = Calendar.getInstance();
-                    itemTime.setTimeInMillis(cursor.getLong(3));
-                    String itemTimeZone = cursor.getString(4);
-                    returnItems.add(new CountdownItem(itemId, itemName, itemDate, itemTime, itemTimeZone));
+                    returnItems.add(retrieveContentValues(cursor));
                 } while (cursor.moveToNext());
             }
             cursor.close();
@@ -126,21 +143,14 @@ public class CountdownDatabase {
 
             Cursor cursor = database.query(CountdownContract.Countdown.TABLE_NAME,   // The table to query
                     projection,             // The array of columns to return (pass null to get all)
-                    whereColumns,                   // The columns for the WHERE clause
-                    whereValues,                   // The values for the WHERE clause
+                    whereColumns,           // The columns for the WHERE clause
+                    whereValues,            // The values for the WHERE clause
                     null,                   // don't group the rows
                     null,                   // don't filter by row groups
-                    null               // The sort order
+                    null                    // The sort order
             );
             if (cursor.moveToFirst()) {
-                long itemId = cursor.getLong(0);
-                String itemName = cursor.getString(1);
-                Calendar itemDate = Calendar.getInstance();
-                itemDate.setTimeInMillis(cursor.getLong(2));
-                Calendar itemTime = Calendar.getInstance();
-                itemTime.setTimeInMillis(cursor.getLong(3));
-                String itemTimeZone = cursor.getString(4);
-                returnItem = new CountdownItem(itemId, itemName, itemDate, itemTime, itemTimeZone);
+                returnItem = retrieveContentValues(cursor);
             }
             cursor.close();
         } catch (Exception e) {
