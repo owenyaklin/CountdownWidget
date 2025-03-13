@@ -28,11 +28,16 @@ public class CountdownDatabase {
     @NonNull
     private static ContentValues insertContentValues(CreateViewModel updateModel) {
         ContentValues values = new ContentValues();
+        // Coordinate date and time to prevent any potential DST issues
+        Calendar itemDate = Objects.requireNonNull(updateModel.getDate().getValue());
+        Calendar itemTime = Objects.requireNonNull(updateModel.getTime().getValue());
+        itemTime.set(itemDate.get(Calendar.YEAR), itemDate.get(Calendar.MONTH), itemDate.get(Calendar.DAY_OF_MONTH));
+        itemDate.set(Calendar.HOUR_OF_DAY, itemTime.get(Calendar.HOUR_OF_DAY));
+        itemDate.set(Calendar.MINUTE, itemTime.get(Calendar.MINUTE));
+
         values.put(CountdownContract.Countdown.COLUMN_NAME_NAME, updateModel.getName().getValue());
-        values.put(CountdownContract.Countdown.COLUMN_NAME_DATE,
-                convertToGMT(Objects.requireNonNull(updateModel.getDate().getValue()).getTimeInMillis()));
-        values.put(CountdownContract.Countdown.COLUMN_NAME_TIME,
-                convertToGMT(Objects.requireNonNull(updateModel.getTime().getValue()).getTimeInMillis()));
+        values.put(CountdownContract.Countdown.COLUMN_NAME_DATE, convertToGMT(itemDate.getTimeInMillis()));
+        values.put(CountdownContract.Countdown.COLUMN_NAME_TIME, convertToGMT(itemTime.getTimeInMillis()));
         values.put(CountdownContract.Countdown.COLUMN_NAME_TIME_ZONE, updateModel.getTimeZone().getValue());
         return values;
     }
@@ -50,13 +55,13 @@ public class CountdownDatabase {
 
     private static long convertToGMT(long toConvert) {
         TimeZone currentTimeZone = TimeZone.getDefault();
-        long currentOffset = currentTimeZone.getOffset(System.currentTimeMillis());
+        long currentOffset = currentTimeZone.getOffset(toConvert);
         return toConvert + currentOffset;
     }
 
     private static long convertFromGMT(long toConvert) {
         TimeZone currentTimeZone = TimeZone.getDefault();
-        long currentOffset = currentTimeZone.getOffset(System.currentTimeMillis());
+        long currentOffset = currentTimeZone.getOffset(toConvert);
         return toConvert - currentOffset;
     }
 
